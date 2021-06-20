@@ -1,20 +1,16 @@
 require("dotenv").config();
-const request = require("request");
 const axios = require("axios");
 const { getUser, getMatchedTodos } = require("../lib/utils");
 
 const TODO = process.env.TODO;
 
-
 /** getTodos :
- * Calls third party api receiving array of objects in string form.
- * The result is Json parsed.
+ * Calls third party api receiving array of objects.
  * from each json object the userId is deleted
  */
 const getTodos = async (req, res) => {
   try {
-    console.log(`this is TODO: ${TODO}`);
-    const todosObj = await axios(TODO);
+    const todosObj = await axios.get(TODO);
     const todos = todosObj.data;
     for (let obj in todos) {
       delete todos[obj].userId;
@@ -25,12 +21,17 @@ const getTodos = async (req, res) => {
   }
 };
 
+/** getUsesrTodos
+ * gets the user info of the given userId
+ * if there is no user with the given userId returns an empty object
+ * Otherwise gets the array of objects containing todos matching to the given userId
+ * Both the data is combined and sent as the result
+ */
 const getUserTodos = async (req, res) => {
   try {
     const userInfo = await getUser(req.params.userId);
-    console.log(`in controllers ${userInfo.id}`);
+
     if (!userInfo.id) {
-      console.log("no user");
       return res.status(200).send(userInfo);
     }
 
